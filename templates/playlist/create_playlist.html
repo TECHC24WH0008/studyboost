@@ -1,0 +1,6 @@
+<h2>新しい再生リスト作成</h2>
+<form method="post">
+  {% csrf_token %}
+  <label>名前: <input type="text" name="name" required></label><br>
+  <button type="submit">作成</button>
+</form>

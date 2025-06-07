@@ -1,0 +1,111 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+/* 全体のコンテナ（バーの背景） */
+.progress-container {
+  width: 90%;
+  height: 20px;
+  background-color: #1c1240; /* ダーク背景 */
+  border-radius: 10px;
+  margin: calc(80px + env(safe-area-inset-top, 10px)) auto 40px auto;  
+  overflow: hidden;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+}
+/* 実際の進捗バー */
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #3cf0a6, #1cd4be);
+  border-radius: 10px;
+  transition: width 0.4s ease-in-out;
+}
+.container {
+  max-width: 400px;
+  margin: 80px auto 30px auto;
+  background: #ffffffdd; /* 少し透け感 */
+  padding: 25px 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+#back-button {
+  width: 50px;
+  height: 50px;
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 10px) + 10px); /* 上から40px下げる */
+  left: 10px;
+  z-index: 1000;
+  padding: 5px;
+  margin-left: 40px;
+  border: none;
+  border-radius: 6px;
+  background: #0284c7;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  font-size: 20px;
+  min-width: 40px;
+  max-width: 120px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+#back-button:hover {
+  background-color: #0369a1;
+}
+
+h1 {
+    margin: 20px;
+    padding: 15px;
+    display: flex;
+    position: relative;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    color: #000e15;
+    
+}
+
+button {
+  padding: 12px 25px;
+  margin: 15px 0;
+  background-color: #0284c7;
+  background-image: linear-gradient(45deg, #0284c7, #0ea5e9);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+  display: block;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+button:hover {
+  background-color: #0369a1;
+  transform: scale(1.05);
+}
+h2 {
+  margin: 12px 0;
+  font-weight: 700;
+  color: #0c4a6e;
+}
+
+.correct {
+  background-color: #10b981 !important; /* 緑色 */
+    background-image: none !important;
+  color: white
+}
+
+.incorrect {
+  background-color: #ef4444 !important; /* 赤色 */
+    background-image: none !important;
+  color: white
+}

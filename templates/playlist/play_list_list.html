@@ -1,0 +1,9 @@
+<h2>再生リスト一覧</h2>
+<a href="{% url 'playlist:create_playlist' %}">新しい再生リストを作成</a>
+<ul>
+{% for pl in playlists %}
+  <li><a href="{% url 'playlist:playlist_detail' pl.id %}">{{ pl.name }}</a></li>
+{% empty %}
+  <li>再生リストがありません。</li>
+{% endfor %}
+</ul>

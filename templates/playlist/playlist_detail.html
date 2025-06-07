@@ -1,0 +1,14 @@
+{% for video in videos %}
+  <div>
+    <h3>{{ video.title }}</h3>
+    <p>チャンネル: {{ video.channel_title }}</p>
+
+    {% if video.is_processed %}
+      <p style="color: green;">✔ クイズ生成済み</p>
+      <a href="{% url 'quiz:quiz_list' video.id %}">▶ クイズを見る</a>
+    {% else %}
+      <p style="color: orange;">⌛ クイズ生成中...</p>
+    {% endif %}
+  </div>
+  <hr>
+{% endfor %}

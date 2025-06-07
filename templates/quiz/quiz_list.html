@@ -1,0 +1,20 @@
+<h2>{{ video.title }} のクイズ</h2>
+
+{% if quizzes %}
+  {% for quiz in quizzes %}
+    <div>
+      <p><strong>Q{{ forloop.counter }}: {{ quiz.question }}</strong></p>
+      <ul>
+        <li>1. {{ quiz.option_1 }}</li>
+        <li>2. {{ quiz.option_2 }}</li>
+        <li>3. {{ quiz.option_3 }}</li>
+        <li>4. {{ quiz.option_4 }}</li>
+      </ul>
+      <p>✔ 正解: {{ quiz.correct_option }}</p>
+      <p>💡 解説: {{ quiz.explanation }}</p>
+    </div>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>この動画にはまだクイズがありません。</p>
+{% endif %}
