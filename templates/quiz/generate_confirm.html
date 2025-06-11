@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}クイズ生成 - StudyBoost{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-magic me-2"></i>クイズ生成
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <h5>動画: {{ video.title }}</h5>
+                    
+                    {% if has_existing_quiz %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            この動画には既に{{ existing_quiz_count }}問のクイズが存在します。
+                            新しく生成すると既存のクイズは削除されます。
+                        </div>
+                    {% endif %}
+                    
+                    <!-- ★ AI設定状況表示 -->
+                    {% if ai_status %}
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-robot me-2"></i>AI生成設定状況</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if ai_status.openai_available %}
+                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                        <span>OpenAI GPT利用可能</span>
+                                    {% else %}
+                                        <i class="fas fa-times-circle text-danger me-2"></i>
+                                        <span>OpenAI GPT利用不可</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if ai_status.huggingface_available %}
+                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                        <span>Hugging Face利用可能</span>
+                                    {% else %}
+                                        <i class="fas fa-times-circle text-danger me-2"></i>
+                                        <span>Hugging Face利用不可</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if not ai_status.openai_available and not ai_status.huggingface_available %}
+                            <div class="alert alert-warning mt-2 mb-0">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    AI APIが利用できないため、フォールバッククイズが生成されます。
+                                </small>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <form id="generateForm" method="POST">
+                        {% csrf_token %}
+                        
+                        <!-- 生成モード選択 -->
+                        <div class="mb-3">
+                            <label class="form-label">生成方式:</label>
+                            {% for option in generation_options %}
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="radio" 
+                                       name="generation_mode" 
+                                       id="{{ option.name }}" 
+                                       value="{{ option.name }}"
+                                       {% if option.name == 'normal' %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ option.name }}">
+                                    {{ option.label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'accounts:dashboard' %}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left me-1"></i>戻る
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="generateBtn">
+                                <i class="fas fa-magic me-1"></i>クイズを生成
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('generateForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const btn = document.getElementById('generateBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>生成中...';
+    
+    try {
+        const formData = new FormData(this);
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // ★ 生成詳細を表示
+            let message = data.message;
+            if (data.generation_details) {
+                message += `\n\n生成方法: ${data.generation_details.method}`;
+                message += `\nAI試行: ${data.generation_details.ai_attempted ? 'あり' : 'なし'}`;
+                message += `\nAI成功: ${data.generation_details.ai_success ? 'はい' : 'いいえ'}`;
+                message += `\nフォールバック使用: ${data.generation_details.fallback_used ? 'はい' : 'いいえ'}`;
+                
+                if (data.generation_details.error_messages.length > 0) {
+                    message += `\nエラー: ${data.generation_details.error_messages.join(', ')}`;
+                }
+            }
+            
+            alert(message);
+            
+            if (confirm('生成されたクイズを実行しますか？')) {
+                window.location.href = data.redirect_url;
+            } else {
+                window.location.href = "{% url 'accounts:dashboard' %}";
+            }
+        } else {
+            alert(`エラー: ${data.error}`);
+        }
+    } catch (error) {
+        alert(`エラー: ${error.message}`);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+});
+</script>
+{% endblock %}

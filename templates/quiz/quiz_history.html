@@ -1,0 +1,82 @@
+<!-- filepath: c:\Users\taise\OneDrive\デスクトップ\d\studyboost\templates\quiz\quiz_history.html -->
+{% extends 'base.html' %}
+
+{% block title %}クイズ履歴 - StudyBoost{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1><i class="fas fa-history me-2"></i>クイズ履歴</h1>
+    
+    <!-- 統計サマリー -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>{{ total_attempts }}</h3>
+                    <small class="text-muted">総回答数</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>{{ correct_attempts }}</h3>
+                    <small class="text-muted">正解数</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>{{ accuracy }}%</h3>
+                    <small class="text-muted">正答率</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 履歴一覧 -->
+    <div class="card">
+        <div class="card-body">
+            {% if histories %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>動画</th>
+                                <th>問題</th>
+                                <th>結果</th>
+                                <th>回答日時</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for history in histories %}
+                            <tr>
+                                <td>{{ history.quiz.video.title|truncatechars:30 }}</td>
+                                <td>{{ history.quiz.question|truncatechars:50 }}</td>
+                                <td>
+                                    {% if history.is_correct %}
+                                        <span class="badge bg-success">正解</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">不正解</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ history.answered_at|date:"Y/m/d H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">履歴がありません</p>
+                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary">
+                        クイズを始める
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

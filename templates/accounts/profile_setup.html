@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>プロフィール設定</title>
+    {% load static %}
+    {% block extra_css %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+    .setup-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .setup-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    .setup-icon {
+        font-size: 4rem;
+        color: #007bff;
+        margin-bottom: 20px;
+    }
+
+    .form-floating {
+        margin-bottom: 24px;
+    }
+
+    .btn-setup {
+        width: 100%;
+        padding: 16px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+    }
+
+    .setup-benefits {
+        background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 32px;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .benefit-icon {
+        width: 32px;
+        height: 32px;
+        background: #007bff;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+        .setup-container {
+            margin: 20px;
+            padding: 24px;
+        }
+        
+        .setup-icon {
+            font-size: 3rem;
+        }
+    }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    {% block title %}
+        {% if is_first_setup %}初回設定{% else %}プロフィール更新{% endif %} - StudyBoost
+    {% endblock %}
+
+    {% block content %}
+    <div class="container">
+        <div class="setup-container">
+            <div class="setup-header">
+                <div class="setup-icon">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <h2 class="mb-3">
+                    {% if is_first_setup %}
+                        <i class="fas fa-star me-2 text-warning"></i>
+                        ようこそ StudyBoost へ！
+                    {% else %}
+                        <i class="fas fa-edit me-2"></i>
+                        プロフィール更新
+                    {% endif %}
+                </h2>
+                <p class="text-muted">
+                    {% if is_first_setup %}
+                        学習体験をパーソナライズするために、簡単な設定をお願いします
+                    {% else %}
+                        プロフィール情報を更新できます
+                    {% endif %}
+                </p>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="form-floating">
+                    {{ form.nickname }}
+                    <label for="{{ form.nickname.id_for_label }}">
+                        <i class="fas fa-user me-2"></i>{{ form.nickname.label }}
+                    </label>
+                    {% if form.nickname.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.nickname.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <div class="form-text">{{ form.nickname.help_text }}</div>
+                </div>
+
+                <div class="form-floating">
+                    {{ form.birth_date }}
+                    <label for="{{ form.birth_date.id_for_label }}">
+                        <i class="fas fa-calendar me-2"></i>{{ form.birth_date.label }}
+                    </label>
+                    {% if form.birth_date.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.birth_date.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <div class="form-text">{{ form.birth_date.help_text }}</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-setup">
+                    <i class="fas fa-check me-2"></i>
+                    {% if is_first_setup %}設定を完了{% else %}更新する{% endif %}
+                </button>
+            </form>
+
+            {% if is_first_setup %}
+            <div class="setup-benefits">
+                <h6 class="mb-3">
+                    <i class="fas fa-magic me-2 text-primary"></i>
+                    プロフィール設定で得られるメリット
+                </h6>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <strong>年齢に適したクイズ</strong><br>
+                        <small class="text-muted">あなたの年齢に最適化されたクイズが自動生成されます</small>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <strong>パーソナライズされた学習体験</strong><br>
+                        <small class="text-muted">学習進捗と統計があなた専用に最適化されます</small>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div>
+                        <strong>学習成果の記録</strong><br>
+                        <small class="text-muted">あなたの成長を詳細に記録・分析します</small>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // フォームバリデーション
+        const form = document.querySelector('form');
+        const nicknameInput = document.getElementById('{{ form.nickname.id_for_label }}');
+        const birthDateInput = document.getElementById('{{ form.birth_date.id_for_label }}');
+        
+        // リアルタイムバリデーション
+        nicknameInput.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+        
+        birthDateInput.addEventListener('change', function() {
+            if (this.value) {
+                const birthDate = new Date(this.value);
+                const today = new Date();
+                const age = today.getFullYear() - birthDate.getFullYear();
+                
+                if (age >= 5 && age <= 120) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            }
+        });
+        
+        // フォーム送信時の確認
+        form.addEventListener('submit', function(e) {
+            const nickname = nicknameInput.value.trim();
+            const birthDate = birthDateInput.value;
+            
+            if (!nickname || !birthDate) {
+                e.preventDefault();
+                alert('すべての項目を入力してください。');
+                return false;
+            }
+            
+            // 送信ボタンを無効化
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>設定中...';
+        });
+    });
+    </script>
+    {% endblock %}
+</body>
+</html>

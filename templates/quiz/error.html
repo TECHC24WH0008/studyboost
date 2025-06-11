@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}エラー - StudyBoost{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="alert alert-danger">
+                <h4><i class="fas fa-exclamation-triangle me-2"></i>エラーが発生しました</h4>
+                <p>{{ error_message }}</p>
+                <hr>
+                <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary">
+                    <i class="fas fa-home me-1"></i>ダッシュボードに戻る
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

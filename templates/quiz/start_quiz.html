@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クイズ実行 - StudyBoost</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .question-card {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+        .option-btn {
+            width: 100%;
+            text-align: left;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .option-btn:hover {
+            border-color: #007bff;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+        .option-btn.selected {
+            border-color: #007bff;
+            background: #007bff;
+            color: white;
+        }
+        .progress-custom {
+            height: 8px;
+            border-radius: 10px;
+        }
+        .quiz-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        .submit-answer-btn {
+            transition: all 0.3s ease;
+        }
+        .submit-answer-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <div class="quiz-container">
+            <!-- ヘッダー -->
+            <div class="card question-card mb-4">
+                <div class="card-header quiz-header text-center py-4">
+                    <h3 class="mb-2">
+                        <i class="fas fa-question-circle me-2"></i>
+                        クイズチャレンジ
+                    </h3>
+                    <h6 class="mb-0 opacity-75">{{ video.title }}</h6>
+                </div>
+                <div class="card-body">
+                    <!-- 進捗バー -->
+                    <div class="row align-items-center mb-3">
+                        <div class="col-8">
+                            <div class="progress progress-custom">
+                                <div class="progress-bar bg-success" 
+                                     role="progressbar" 
+                                     style="width: 0%" 
+                                     id="progressBar">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <span class="badge bg-primary fs-6" id="questionCounter">
+                                1 / {{ total_questions }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- スコア表示 -->
+                    <div class="text-center">
+                        <span class="badge bg-success me-2">
+                            <i class="fas fa-star me-1"></i>
+                            スコア: <span id="currentScore">0</span>
+                        </span>
+                        <span class="badge bg-info">
+                            <i class="fas fa-clock me-1"></i>
+                            残り: <span id="remainingQuestions">{{ total_questions }}</span>問
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- クイズ問題エリア -->
+            <div id="quizContainer">
+                {% for quiz in quizzes %}
+                <div class="card question-card quiz-question" 
+                     data-quiz-id="{{ quiz.id }}" 
+                     data-question-number="{{ forloop.counter }}"
+                     style="{% if not forloop.first %}display: none;{% endif %}">
+                    
+                    <div class="card-body p-4">
+                        <!-- 問題番号 -->
+                        <div class="text-center mb-3">
+                            <span class="badge bg-warning text-dark fs-6">
+                                問題 {{ forloop.counter }}
+                            </span>
+                        </div>
+                        
+                        <!-- 問題文 -->
+                        <h5 class="card-title text-center mb-4 fw-bold">
+                            {{ quiz.question }}
+                        </h5>
+                        
+                        <!-- 選択肢 -->
+                        <div class="options-container">
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <button class="btn option-btn" data-option="1">
+                                        <span class="fw-bold me-2">A.</span>
+                                        {{ quiz.option_1 }}
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <button class="btn option-btn" data-option="2">
+                                        <span class="fw-bold me-2">B.</span>
+                                        {{ quiz.option_2 }}
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <button class="btn option-btn" data-option="3">
+                                        <span class="fw-bold me-2">C.</span>
+                                        {{ quiz.option_3 }}
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <button class="btn option-btn" data-option="4">
+                                        <span class="fw-bold me-2">D.</span>
+                                        {{ quiz.option_4 }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 回答ボタン（ユニークなクラス名を使用） -->
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary btn-lg px-5 submit-answer-btn" 
+                                    data-question-id="{{ forloop.counter }}"
+                                    disabled>
+                                <i class="fas fa-check me-2"></i>
+                                回答する
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- 結果表示エリア -->
+            <div id="resultContainer" style="display: none;">
+                <div class="card question-card">
+                    <div class="card-body text-center p-5">
+                        <div id="resultIcon" class="mb-3">
+                            <!-- アイコンが動的に挿入されます -->
+                        </div>
+                        <h4 id="resultTitle" class="mb-3"></h4>
+                        <p id="resultExplanation" class="text-muted mb-4"></p>
+                        <button class="btn btn-success btn-lg" id="nextQuestion">
+                            <i class="fas fa-arrow-right me-2"></i>
+                            <span id="nextBtnText">次の問題へ</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 完了ボタン -->
+            <div class="text-center mt-4">
+                <a href="/accounts/dashboard/" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    ダッシュボードに戻る
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% csrf_token %}
+    
+    <script>
+    // クイズ管理オブジェクト
+    const QuizManager = {
+        currentQuestion: 1,
+        totalQuestions: {{ total_questions }},
+        score: 0,
+        selectedOption: null,
+        videoId: {{ video.id }},
+        
+        init() {
+            console.log('🎯 クイズ開始 - 総問題数:', this.totalQuestions);
+            this.bindEvents();
+            this.updateProgress();
+        },
+        
+        bindEvents() {
+            // イベント委譲を使用
+            document.addEventListener('click', (e) => {
+                // 選択肢クリック
+                if (e.target.classList.contains('option-btn') || e.target.closest('.option-btn')) {
+                    const optionBtn = e.target.classList.contains('option-btn') 
+                        ? e.target 
+                        : e.target.closest('.option-btn');
+                    this.selectOption(optionBtn);
+                }
+                
+                // 回答ボタンクリック（クラス名で判定）
+                if (e.target.classList.contains('submit-answer-btn') || e.target.closest('.submit-answer-btn')) {
+                    e.preventDefault();
+                    this.submitAnswer();
+                }
+                
+                // 次の問題ボタンクリック
+                if (e.target.id === 'nextQuestion' || e.target.closest('#nextQuestion')) {
+                    e.preventDefault();
+                    this.nextQuestion();
+                }
+            });
+        },
+        
+        selectOption(optionBtn) {
+            // 現在表示中の問題の選択肢のみを対象にする
+            const currentQuizCard = document.querySelector('.quiz-question:not([style*="display: none"])');
+            if (!currentQuizCard) return;
+            
+            const currentOptions = currentQuizCard.querySelectorAll('.option-btn');
+            
+            // 現在の問題の選択肢の選択状態をリセット
+            currentOptions.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // 新しい選択を設定
+            optionBtn.classList.add('selected');
+            this.selectedOption = optionBtn.dataset.option;
+            
+            // 現在の問題の回答ボタンを有効化
+            const currentSubmitBtn = currentQuizCard.querySelector('.submit-answer-btn');
+            if (currentSubmitBtn) {
+                currentSubmitBtn.disabled = false;
+            }
+            
+            console.log('✅ 選択肢選択:', this.selectedOption);
+        },
+        
+        async submitAnswer() {
+            if (!this.selectedOption) {
+                alert('選択肢を選んでください');
+                return;
+            }
+            
+            const currentQuizCard = document.querySelector('.quiz-question:not([style*="display: none"])');
+            if (!currentQuizCard) return;
+            
+            const quizId = currentQuizCard.dataset.quizId;
+            
+            // 回答ボタンを無効化（連続クリック防止）
+            const submitBtn = currentQuizCard.querySelector('.submit-answer-btn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送信中...';
+            }
+            
+            console.log('📤 回答送信:', { quizId, selectedOption: this.selectedOption });
+            
+            try {
+                const response = await fetch(`/quiz/submit/${this.videoId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        quiz_id: quizId,
+                        selected_option: this.selectedOption
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('📥 回答結果:', data);
+                
+                if (data.success) {
+                    this.showResult(data);
+                } else {
+                    alert('エラー: ' + data.error);
+                    // エラー時はボタンを復元
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>回答する';
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ 回答送信エラー:', error);
+                alert('通信エラーが発生しました');
+                // エラー時はボタンを復元
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>回答する';
+                }
+            }
+        },
+        
+        showResult(data) {
+            console.log('📊 結果表示:', data);
+            
+            // 問題を非表示
+            document.getElementById('quizContainer').style.display = 'none';
+            
+            // 結果を表示
+            const resultContainer = document.getElementById('resultContainer');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultExplanation = document.getElementById('resultExplanation');
+            const nextBtnText = document.getElementById('nextBtnText');
+            
+            if (data.is_correct) {
+                resultIcon.innerHTML = '<i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>';
+                resultTitle.innerHTML = '<span class="text-success">正解！</span>';
+                resultTitle.className = 'mb-3 text-success';
+                this.score++;
+            } else {
+                resultIcon.innerHTML = '<i class="fas fa-times-circle text-danger" style="font-size: 4rem;"></i>';
+                resultTitle.innerHTML = '<span class="text-danger">不正解</span>';
+                resultTitle.className = 'mb-3 text-danger';
+                
+                // 正解の選択肢を表示
+                const correctOptionText = this.getCorrectOptionText(data.correct_option);
+                resultTitle.innerHTML += `<br><small class="text-muted">正解: ${correctOptionText}</small>`;
+            }
+            
+            resultExplanation.textContent = data.explanation;
+            
+            // 最後の問題かどうかでボタンテキストを変更
+            if (this.currentQuestion >= this.totalQuestions) {
+                nextBtnText.innerHTML = '<i class="fas fa-trophy me-2"></i>結果を見る';
+            } else {
+                nextBtnText.innerHTML = '次の問題へ';
+            }
+            
+            resultContainer.style.display = 'block';
+            
+            // スコア更新
+            document.getElementById('currentScore').textContent = this.score;
+            
+            console.log(`📊 現在のスコア: ${this.score}/${this.currentQuestion}`);
+        },
+        
+        getCorrectOptionText(correctOption) {
+            const currentQuizCard = document.querySelector('.quiz-question:not([style*="display: none"])');
+            if (!currentQuizCard) {
+                // 非表示になっている場合は、現在の問題番号から取得
+                const questionCard = document.querySelector(`[data-question-number="${this.currentQuestion}"]`);
+                if (questionCard) {
+                    const optionBtn = questionCard.querySelector(`[data-option="${correctOption}"]`);
+                    return optionBtn ? optionBtn.textContent.trim() : '不明';
+                }
+                return '不明';
+            }
+            
+            const optionBtn = currentQuizCard.querySelector(`[data-option="${correctOption}"]`);
+            return optionBtn ? optionBtn.textContent.trim() : '不明';
+        },
+        
+        nextQuestion() {
+            console.log(`📍 nextQuestion called: current=${this.currentQuestion}, total=${this.totalQuestions}`);
+            
+            // 結果を非表示
+            document.getElementById('resultContainer').style.display = 'none';
+            
+            if (this.currentQuestion >= this.totalQuestions) {
+                // 全問完了 - 結果画面にリダイレクト
+                console.log('🎉 クイズ完了！結果画面に移動');
+                window.location.href = `/quiz/result/${this.videoId}/`;
+                return;
+            }
+            
+            // 次の問題を表示
+            this.currentQuestion++;
+            this.selectedOption = null;
+            
+            // 現在の問題を非表示
+            document.querySelectorAll('.quiz-question').forEach(card => {
+                card.style.display = 'none';
+            });
+            
+            // 次の問題を表示
+            const nextQuestionCard = document.querySelector(`[data-question-number="${this.currentQuestion}"]`);
+            if (nextQuestionCard) {
+                nextQuestionCard.style.display = 'block';
+                
+                // 次の問題の回答ボタンを初期化
+                const nextSubmitBtn = nextQuestionCard.querySelector('.submit-answer-btn');
+                if (nextSubmitBtn) {
+                    nextSubmitBtn.disabled = true;
+                    nextSubmitBtn.innerHTML = '<i class="fas fa-check me-2"></i>回答する';
+                }
+            }
+            
+            // UI更新
+            this.updateProgress();
+            document.getElementById('quizContainer').style.display = 'block';
+            
+            console.log(`➡️ 問題 ${this.currentQuestion} に進行`);
+        },
+        
+        updateProgress() {
+            const progress = ((this.currentQuestion - 1) / this.totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('questionCounter').textContent = `${this.currentQuestion} / ${this.totalQuestions}`;
+            document.getElementById('remainingQuestions').textContent = this.totalQuestions - this.currentQuestion + 1;
+        }
+    };
+    
+    // 初期化
+    document.addEventListener('DOMContentLoaded', () => {
+        QuizManager.init();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!-- filepath: c:\Users\taise\OneDrive\デスクトップ\d\studyboost\templates\accounts\ranking.html -->
+{% extends 'base.html' %}
+
+{% block title %}ランキング - StudyBoost{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1><i class="fas fa-trophy me-2"></i>ランキング</h1>
+    
+    <div class="row">
+        <!-- 全体ランキング -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5><i class="fas fa-star me-2"></i>総合ランキング</h5>
+                </div>
+                <div class="card-body">
+                    {% for rank in overall_ranking %}
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge bg-primary me-2">{{ forloop.counter }}</span>
+                        <span class="flex-grow-1">{{ rank.user.username }}</span>
+                        <span class="badge bg-success">{{ rank.experience }} EXP</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">データがありません</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 週間ランキング -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-fire me-2"></i>今週のランキング</h5>
+                </div>
+                <div class="card-body">
+                    {% for rank in weekly_ranking %}
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge bg-primary me-2">{{ forloop.counter }}</span>
+                        <span class="flex-grow-1">{{ rank.user.username }}</span>
+                        <span class="badge bg-info">{{ rank.weekly_correct }}問</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">データがありません</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 正答率ランキング -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-bullseye me-2"></i>正答率ランキング</h5>
+                </div>
+                <div class="card-body">
+                    {% for rank in accuracy_ranking %}
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge bg-primary me-2">{{ forloop.counter }}</span>
+                        <span class="flex-grow-1">{{ rank.user.username }}</span>
+                        <span class="badge bg-success">{{ rank.accuracy|floatformat:1 }}%</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">データがありません</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- あなたの順位 -->
+    {% if user_stats %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5><i class="fas fa-user me-2"></i>あなたの成績</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>総合順位:</strong> {{ user_rank }}位
+                        </div>
+                        <div class="col-md-3">
+                            <strong>レベル:</strong> Lv.{{ user_stats.level }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>経験値:</strong> {{ user_stats.experience }} EXP
+                        </div>
+                        <div class="col-md-3">
+                            <strong>正答率:</strong> {{ user_stats.accuracy|floatformat:1 }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

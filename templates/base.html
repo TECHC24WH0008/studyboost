@@ -1,0 +1,351 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StudyBoost - AI学習プラットフォーム{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+    
+    <style>
+        /* ハンバーガーメニューのスタイル */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: left 0.3s ease;
+            z-index: 1050;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1040;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .sidebar-menu {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding-left: 30px;
+        }
+        
+        .sidebar-menu li a i {
+            width: 20px;
+            margin-right: 15px;
+            text-align: center;
+        }
+        
+        .hamburger-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1060;
+            background: #667eea;
+            border: none;
+            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .hamburger-btn:hover {
+            background: #5a6fd8;
+            transform: scale(1.05);
+        }
+        
+        .main-content {
+            margin-left: 0;
+            padding-top: 80px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .badge-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding-top: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ハンバーガーボタン -->
+    <button class="hamburger-btn" id="hamburgerBtn" type="button">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- サイドバーオーバーレイ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- サイドバー -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            {% if user.is_authenticated %}
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        {% if user.socialaccount_set.all.0.get_avatar_url %}
+                            <img src="{{ user.socialaccount_set.all.0.get_avatar_url }}" 
+                                 alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+                        {% else %}
+                            <i class="fas fa-user"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div class="fw-bold">{{ user.userprofile.nickname|default:user.first_name|default:user.username }}</div>
+                        <small class="text-light">Lv.{{ user.userprofile.level|default:1 }}</small>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="text-center">
+                <h5 class="text-white mb-0">
+                    <i class="fas fa-graduation-cap me-2"></i>StudyBoost
+                </h5>
+                <small class="text-light">AI学習プラットフォーム</small>
+            </div>
+        </div>
+        
+        <ul class="sidebar-menu">
+            {% if user.is_authenticated %}
+                <!-- ダッシュボード -->
+                <li>
+                    <a href="{% url 'accounts:dashboard' %}" 
+                       class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i class="fas fa-home"></i>
+                        <span>ダッシュボード</span>
+                    </a>
+                </li>
+                
+                <!-- 学習統計 -->
+                <li>
+                    <a href="{% url 'quiz:learning_dashboard' %}" 
+                       class="{% if 'learning_dashboard' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i>
+                        <span>学習統計</span>
+                        <span class="badge-notification">!</span>
+                    </a>
+                </li>
+                
+                <!-- ランキング -->
+                <li>
+                    <a href="{% url 'accounts:ranking' %}" 
+                       class="{% if 'ranking' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-trophy"></i>
+                        <span>ランキング</span>
+                    </a>
+                </li>
+                
+                <!-- クイズ履歴 -->
+                <li>
+                    <a href="{% url 'quiz:quiz_history' %}" 
+                       class="{% if 'quiz_history' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-history"></i>
+                        <span>クイズ履歴</span>
+                    </a>
+                </li>
+                
+                <!-- お気に入り -->
+                <li>
+                    <a href="{% url 'accounts:favorites' %}" 
+                       class="{% if 'favorites' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-heart"></i>
+                        <span>お気に入り</span>
+                    </a>
+                </li>
+                
+                <li><hr style="border-color: rgba(255,255,255,0.2); margin: 10px 20px;"></li>
+                
+                <!-- ユーザー設定 -->
+                <li>
+                    <a href="{% url 'accounts:profile_settings' %}" 
+                       class="{% if 'profile_settings' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-user-cog"></i>
+                        <span>ユーザー設定</span>
+                    </a>
+                </li>
+                
+                <!-- 通知設定 -->
+                <li>
+                    <a href="{% url 'accounts:notification_settings' %}" 
+                       class="{% if 'notification_settings' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-bell"></i>
+                        <span>通知設定</span>
+                    </a>
+                </li>
+                
+                <!-- ヘルプ -->
+                <li>
+                    <a href="{% url 'accounts:help' %}" 
+                       class="{% if 'help' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-question-circle"></i>
+                        <span>ヘルプ</span>
+                    </a>
+                </li>
+                
+                <li><hr style="border-color: rgba(255,255,255,0.2); margin: 10px 20px;"></li>
+                
+                <!-- ログアウト -->
+                <li>
+                    <a href="{% url 'account_logout' %}" 
+                       onclick="return confirm('ログアウトしますか？')">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>ログアウト</span>
+                    </a>
+                </li>
+            {% else %}
+                <!-- 未認証ユーザー向け -->
+                <li>
+                    <a href="{% url 'account_login' %}">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>ログイン</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+    <!-- メインコンテンツ -->
+    <main class="main-content" id="mainContent">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 共通JavaScript -->
+    <script src="{% load static %}{% static 'js/base.js' %}"></script>
+    
+    <!-- ハンバーガーメニューのスクリプト -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const mainContent = document.getElementById('mainContent');
+            
+            // メニューの開閉
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+                
+                // ハンバーガーボタンのアイコン変更
+                const icon = hamburgerBtn.querySelector('i');
+                if (sidebar.classList.contains('active')) {
+                    icon.className = 'fas fa-times';
+                } else {
+                    icon.className = 'fas fa-bars';
+                }
+            }
+            
+            // ボタンクリック
+            hamburgerBtn.addEventListener('click', toggleSidebar);
+            
+            // オーバーレイクリック
+            sidebarOverlay.addEventListener('click', toggleSidebar);
+            
+            // ESCキー
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+            });
+            
+            // メニューアイテムクリック時に閉じる（モバイル向け）
+            const menuItems = sidebar.querySelectorAll('.sidebar-menu a');
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        setTimeout(toggleSidebar, 200);
+                    }
+                });
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

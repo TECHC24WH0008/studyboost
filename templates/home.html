@@ -1,0 +1,158 @@
+<!-- filepath: c:\Users\taise\OneDrive\デスクトップ\d\studyboost\templates\home.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}StudyBoost - AI学習支援プラットフォーム{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 text-center">
+            <!-- メインヘッダー -->
+            <div class="hero-section mb-5">
+                <h1 class="display-4 mb-4">
+                    <i class="fas fa-graduation-cap text-primary me-3"></i>
+                    StudyBoost
+                </h1>
+                <p class="lead mb-4 text-muted">
+                    YouTube動画でAI駆動の学習体験を始めましょう<br>
+                    <small>動画を追加するだけで、自動的にクイズが生成されます</small>
+                </p>
+            </div>
+            
+            {% if user.is_authenticated %}
+                <!-- ログイン済みユーザー向け -->
+                <div class="alert alert-success d-flex align-items-center mb-4">
+                    <i class="fas fa-user-check me-3 fa-2x"></i>
+                    <div class="text-start">
+                        <h5 class="mb-1">おかえりなさい、{{ user.username }}さん！</h5>
+                        <small>学習の続きを始めましょう</small>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-tachometer-alt fa-3x text-primary mb-3"></i>
+                                <h5>ダッシュボード</h5>
+                                <p class="card-text small">学習進捗を確認</p>
+                                <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-right me-1"></i>開く
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-success">
+                            <div class="card-body text-center">
+                                <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                                <h5>学習統計</h5>
+                                <p class="card-text small">成績と分析を表示</p>
+                                <a href="{% url 'quiz:learning_dashboard' %}" class="btn btn-success">
+                                    <i class="fas fa-arrow-right me-1"></i>確認
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-info">
+                            <div class="card-body text-center">
+                                <i class="fas fa-cog fa-3x text-info mb-3"></i>
+                                <h5>設定</h5>
+                                <p class="card-text small">プロフィール設定</p>
+                                <a href="{% url 'accounts:settings' %}" class="btn btn-info">
+                                    <i class="fas fa-arrow-right me-1"></i>設定
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            {% else %}
+                <!-- 未ログインユーザー向け -->
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-sign-in-alt fa-3x text-primary mb-3"></i>
+                                <h5>既存ユーザー</h5>
+                                <p class="card-text">学習を継続する</p>
+                                <a href="{% url 'account_login' %}" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-sign-in-alt me-2"></i>ログイン
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 border-success">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
+                                <h5>新規ユーザー</h5>
+                                <p class="card-text">学習を始める</p>
+                                <a href="{% url 'account_signup' %}" class="btn btn-success btn-lg w-100">
+                                    <i class="fas fa-user-plus me-2"></i>新規登録
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 特徴説明 -->
+                <div class="row g-4 text-start">
+                    <div class="col-md-4">
+                        <div class="feature-item">
+                            <i class="fas fa-video fa-2x text-primary mb-3"></i>
+                            <h6>YouTube動画で学習</h6>
+                            <p class="small text-muted">お気に入りの教育系YouTube動画を追加するだけ</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-item">
+                            <i class="fas fa-robot fa-2x text-success mb-3"></i>
+                            <h6>AI自動クイズ生成</h6>
+                            <p class="small text-muted">動画内容に基づいて4択クイズを自動生成</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-item">
+                            <i class="fas fa-chart-bar fa-2x text-info mb-3"></i>
+                            <h6>学習進捗管理</h6>
+                            <p class="small text-muted">成績分析で弱点を把握して効率的に学習</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.hero-section {
+    padding: 40px 0;
+}
+
+.feature-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.card {
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .hero-section {
+        padding: 20px 0;
+    }
+}
+</style>
+{% endblock %}

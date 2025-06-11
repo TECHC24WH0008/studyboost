@@ -1,0 +1,268 @@
+\OneDrive\デスクトップ\d\studyboost\templates\quiz\result.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クイズ結果 - StudyBoost</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .result-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .result-card {
+            border: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .result-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+        }
+        .grade-badge {
+            font-size: 3rem;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .grade-S { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .grade-A { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .grade-B { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .grade-C { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .grade-D { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+        .action-btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .quick-retry {
+            position: relative;
+            overflow: hidden;
+        }
+        .quick-retry::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .quick-retry:hover::before {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="result-container">
+            <!-- 結果カード -->
+            <div class="card result-card">
+                <!-- ヘッダー -->
+                <div class="result-header text-center">
+                    <h2 class="mb-3">
+                        <i class="fas fa-trophy me-2"></i>
+                        クイズ完了！
+                    </h2>
+                    <h5 class="mb-0 opacity-75">{{ video.title }}</h5>
+                </div>
+                
+                <!-- 結果本体 -->
+                <div class="card-body text-center p-5">
+                    <!-- 成績バッジ -->
+                    <div class="grade-badge grade-{{ grade }} text-white mb-4">
+                        {{ grade }}
+                    </div>
+                    
+                    <!-- スコア表示 -->
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-6">
+                            <div class="score-circle bg-primary">
+                                {{ score }} / {{ total }}
+                            </div>
+                            <p class="mt-2 mb-0 text-muted">正答数</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h1 class="display-4 text-primary mb-2">{{ percentage|floatformat:0 }}%</h1>
+                            <p class="mb-0 text-muted">正答率</p>
+                        </div>
+                    </div>
+                    
+                    <!-- メッセージ -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>{{ message }}</strong>
+                    </div>
+                    
+                    <!-- 詳細統計 -->
+                    <div class="row text-center mb-4">
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded">
+                                <h4 class="text-success mb-1">{{ score }}</h4>
+                                <small class="text-muted">正解</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded">
+                                <h4 class="text-danger mb-1">{{ total|add:score|add:"-"|add:score|add:"-"|add:score }}</h4>
+                                <small class="text-muted">不正解</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded">
+                                <h4 class="text-primary mb-1">{{ total }}</h4>
+                                <small class="text-muted">総問題数</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- アクションボタン -->
+                    <div class="d-flex flex-column gap-3">
+                        <!-- 再挑戦ボタン（修正済み） -->
+                        <a href="{% url 'quiz:take_quiz' video.id %}" class="btn btn-primary action-btn quick-retry">
+                            <i class="fas fa-redo me-2"></i>
+                            もう一度挑戦する
+                        </a>
+                        
+                        <!-- 新しいクイズ生成ボタン -->
+                        <a href="{% url 'quiz:generate_quiz' video.id %}" class="btn btn-outline-primary action-btn">
+                            <i class="fas fa-magic me-2"></i>
+                            新しいクイズを生成する
+                        </a>
+                        
+                        <!-- ダッシュボードに戻る -->
+                        <a href="/accounts/dashboard/" class="btn btn-outline-secondary action-btn">
+                            <i class="fas fa-home me-2"></i>
+                            ダッシュボードに戻る
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 学習統計（将来実装） -->
+            <div class="text-center mt-4">
+                <small class="text-muted">
+                    <i class="fas fa-chart-line me-1"></i>
+                    学習統計機能（準備中）
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- アニメーション & インタラクション -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const percentage = {{ percentage }};
+        const gradeBadge = document.querySelector('.grade-badge');
+        
+        // 成績に応じたアニメーション
+        if (percentage >= 90) {
+            gradeBadge.style.animation = 'pulse 2s infinite, glow 2s ease-in-out infinite alternate';
+            console.log('🌟 S評価達成！完璧です！');
+        } else if (percentage >= 80) {
+            gradeBadge.style.animation = 'bounce 1s ease-in-out';
+            console.log('✨ A評価達成！素晴らしいです！');
+        } else if (percentage >= 70) {
+            gradeBadge.style.animation = 'tada 1s ease-in-out';
+            console.log('👏 B評価達成！よくできました！');
+        }
+        
+        // ページロード時のスムーズアニメーション
+        const resultCard = document.querySelector('.result-card');
+        resultCard.style.opacity = '0';
+        resultCard.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            resultCard.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            resultCard.style.opacity = '1';
+            resultCard.style.transform = 'translateY(0)';
+        }, 100);
+        
+        // 再挑戦ボタンのクリック追跡
+        document.querySelector('.quick-retry').addEventListener('click', function(e) {
+            console.log('🔄 再挑戦ボタンクリック - 同じクイズを再開');
+            
+            // ローディング表示（オプション）
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>読み込み中...';
+            this.classList.add('disabled');
+        });
+        
+        // 新クイズ生成ボタンのクリック追跡
+        document.querySelector('[href*="generate"]').addEventListener('click', function(e) {
+            console.log('🎲 新クイズ生成ボタンクリック');
+            
+            this.innerHTML = '<i class="fas fa-magic me-2"></i>生成中...';
+            this.classList.add('disabled');
+        });
+        
+        // 結果統計をログ出力
+        console.log('📊 クイズ結果詳細:', {
+            video: '{{ video.title }}',
+            score: {{ score }},
+            total: {{ total }},
+            percentage: {{ percentage }},
+            grade: '{{ grade }}',
+            timestamp: new Date().toISOString()
+        });
+    });
+    
+    // CSSアニメーション定義
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(240, 147, 251, 0.5); }
+            to { box-shadow: 0 0 30px rgba(245, 87, 108, 0.8); }
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+        @keyframes tada {
+            0% { transform: scale(1); }
+            10%, 20% { transform: scale(0.9) rotate(-3deg); }
+            30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+            40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+        .disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+    `;
+    document.head.appendChild(style);
+    </script>
+</body>
+</html>

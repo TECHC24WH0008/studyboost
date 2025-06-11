@@ -1,0 +1,35 @@
+<!-- filepath: c:\Users\taise\OneDrive\デスクトップ\d\studyboost\templates\accounts\error.html -->
+{% extends 'base.html' %}
+
+{% block title %}エラー - StudyBoost{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>エラーが発生しました
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <strong>エラー内容:</strong><br>
+                        {{ error_message|default:"不明なエラーが発生しました" }}
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-home me-1"></i>ダッシュボードに戻る
+                        </a>
+                        <button onclick="history.back()" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>前のページに戻る
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

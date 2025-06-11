@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クイズ未作成 - StudyBoost</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .no-quiz-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .no-quiz-card {
+            border: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .no-quiz-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+        }
+        .no-quiz-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        .action-btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="no-quiz-container">
+            <div class="card no-quiz-card">
+                <!-- ヘッダー -->
+                <div class="no-quiz-header">
+                    <div class="no-quiz-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h2 class="mb-3">クイズがありません</h2>
+                    <h5 class="mb-0 opacity-75">{{ video.title }}</h5>
+                </div>
+                
+                <!-- 本体 -->
+                <div class="card-body p-5">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {{ message }}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-muted">
+                            この動画の内容に基づいてAIが自動的にクイズを作成します。<br>
+                            数秒で完了しますので、ぜひお試しください！
+                        </p>
+                    </div>
+                    
+                    <!-- アクションボタン -->
+                    <div class="d-flex flex-column gap-3">
+                        <!-- クイズ生成ボタン -->
+                        <a href="{{ generate_url }}" class="btn btn-primary action-btn">
+                            <i class="fas fa-magic me-2"></i>
+                            AIクイズを生成する
+                        </a>
+                        
+                        <!-- ダッシュボードに戻る -->
+                        <a href="/accounts/dashboard/" class="btn btn-outline-secondary action-btn">
+                            <i class="fas fa-home me-2"></i>
+                            ダッシュボードに戻る
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

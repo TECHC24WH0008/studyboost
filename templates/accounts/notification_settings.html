@@ -1,0 +1,56 @@
+<!-- filepath: c:\Users\taise\OneDrive\デスクトップ\d\studyboost\templates\accounts\notification_settings.html -->
+{% extends 'base.html' %}
+
+{% block title %}通知設定 - StudyBoost{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1><i class="fas fa-bell me-2"></i>通知設定</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="email_quiz_reminder" 
+                                       {% if notification_settings.email_quiz_reminder %}checked{% endif %}>
+                                <label class="form-check-label" for="email_quiz_reminder">
+                                    クイズのリマインダーメール
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="email_achievements" 
+                                       {% if notification_settings.email_achievements %}checked{% endif %}>
+                                <label class="form-check-label" for="email_achievements">
+                                    達成通知メール
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="weekly_report" 
+                                       {% if notification_settings.weekly_report %}checked{% endif %}>
+                                <label class="form-check-label" for="weekly_report">
+                                    週次レポートメール
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>設定を保存
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

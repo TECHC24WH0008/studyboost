@@ -1,0 +1,65 @@
+<!-- filepath: c:\Users\taise\OneDrive\デスクトップ\d\studyboost\templates\accounts\help.html -->
+{% extends 'base.html' %}
+
+{% block title %}ヘルプ - StudyBoost{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1><i class="fas fa-question-circle me-2"></i>ヘルプ</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="accordion" id="helpAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#help1">
+                            動画の追加方法
+                        </button>
+                    </h2>
+                    <div id="help1" class="accordion-collapse collapse show">
+                        <div class="accordion-body">
+                            <ol>
+                                <li>右下の「+」ボタンをクリック</li>
+                                <li>YouTube URLを入力</li>
+                                <li>「自動取得」ボタンでタイトルを取得</li>
+                                <li>「動画を追加」をクリック</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#help2">
+                            クイズの生成方法
+                        </button>
+                    </h2>
+                    <div id="help2" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <ol>
+                                <li>動画カードの「クイズ生成」ボタンをクリック</li>
+                                <li>AIが自動で5問のクイズを生成</li>
+                                <li>生成されたクイズで学習開始</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#help3">
+                            サポート
+                        </button>
+                    </h2>
+                    <div id="help3" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            問題が解決しない場合は、以下にお問い合わせください：<br>
+                            Email: support@studyboost.com
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>StudyBoost - AI学習クイズ</title>
+</head>
+<body>
+    <h1>StudyBoost へようこそ</h1>
+    
+    {% if user.is_authenticated %}
+        <p>こんにちは、{{ user.username }}さん！</p>
+        <a href="{% url 'playlist:import_video' %}">動画をインポート</a>
+        <a href="/accounts/logout/">ログアウト</a>
+    {% else %}
+        <p>YouTubeの学習動画からAIがクイズを生成します</p>
+        <a href="/accounts/google/login/">Googleでログイン</a>
+    {% endif %}
+</body>
+</html>

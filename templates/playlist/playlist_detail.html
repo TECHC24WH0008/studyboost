@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ playlist.title }} - StudyBoost{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-list me-2"></i>{{ playlist.title }}</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVideoModal">
+                    <i class="fas fa-plus me-1"></i>動画を追加
+                </button>
+            </div>
+            
+            {% if videos %}
+                <div class="row">
+                    {% for video in videos %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ video.title }}</h6>
+                                <p class="card-text">
+                                    <small class="text-muted">Video ID: {{ video.video_id }}</small>
+                                </p>
+                                <a href="https://www.youtube.com/watch?v={{ video.video_id }}" 
+                                   target="_blank" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fab fa-youtube me-1"></i>YouTube で見る
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-video fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">動画がありません</h4>
+                    <p class="text-muted">プラスボタンをクリックして最初の動画を追加しましょう。</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 動画追加モーダル -->
+<div class="modal fade" id="addVideoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">動画を追加</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="video_url" class="form-label">YouTube URL</label>
+                    <input type="url" class="form-control" id="video_url" required>
+                </div>
+                <div class="mb-3">
+                    <label for="video_title" class="form-label">タイトル</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="video_title" required>
+                        <button class="btn btn-outline-secondary" type="button" id="autoFetchBtn" disabled>
+                            タイトル取得
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                <button type="button" class="btn btn-primary" id="addVideoBtn">追加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const videoUrlInput = document.getElementById('video_url');
+    const videoTitleInput = document.getElementById('video_title');
+    const autoFetchBtn = document.getElementById('autoFetchBtn');
+    const addVideoBtn = document.getElementById('addVideoBtn');
+    
+    // URL入力時の処理
+    videoUrlInput.addEventListener('input', function() {
+        const url = this.value.trim();
+        const isValid = url.includes('youtube.com') || url.includes('youtu.be');
+        autoFetchBtn.disabled = !isValid;
+    });
+    
+    // タイトル取得
+    autoFetchBtn.addEventListener('click', async function() {
+        const url = videoUrlInput.value.trim();
+        const videoId = extractVideoId(url);
+        
+        if (!videoId) {
+            alert('有効なYouTube URLを入力してください');
+            return;
+        }
+        
+        try {
+            this.disabled = true;
+            this.textContent = '取得中...';
+            
+            const response = await fetch(`/playlist/get-youtube-title/${videoId}/`);
+            const data = await response.json();
+            
+            if (data.success) {
+                videoTitleInput.value = data.title;
+            } else {
+                alert('タイトルの取得に失敗しました');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('エラーが発生しました');
+        } finally {
+            this.disabled = false;
+            this.textContent = 'タイトル取得';
+        }
+    });
+    
+    // 動画追加
+    addVideoBtn.addEventListener('click', async function() {
+        const url = videoUrlInput.value.trim();
+        const title = videoTitleInput.value.trim();
+        
+        if (!url || !title) {
+            alert('URLとタイトルを入力してください');
+            return;
+        }
+        
+        try {
+            this.disabled = true;
+            this.textContent = '追加中...';
+            
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            const response = await fetch('/playlist/add-video/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    url: url,
+                    title: title,
+                    playlist_id: {{ playlist.id }}
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('動画を追加しました！');
+                location.reload();
+            } else {
+                alert('エラー: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('エラーが発生しました');
+        } finally {
+            this.disabled = false;
+            this.textContent = '追加';
+        }
+    });
+    
+    function extractVideoId(url) {
+        const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        return match ? match[1] : null;
+    }
+});
+</script>
+{% endblock %}

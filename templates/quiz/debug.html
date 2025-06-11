@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>動画処理デバッグ情報</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>動画処理デバッグ情報</h1>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>動画情報</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr><th>ID</th><td>{{ debug_info.video_id }}</td></tr>
+                    <tr><th>タイトル</th><td>{{ debug_info.video_title }}</td></tr>
+                    <tr><th>URL</th><td>{{ debug_info.video_url }}</td></tr>
+                    <tr><th>処理中</th><td>
+                        {% if debug_info.is_processing %}
+                            <span class="badge bg-warning">Yes</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No</span>
+                        {% endif %}
+                    </td></tr>
+                    <tr><th>処理完了</th><td>
+                        {% if debug_info.is_processed %}
+                            <span class="badge bg-success">Yes</span>
+                        {% else %}
+                            <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </td></tr>
+                    <tr><th>作成日時</th><td>{{ debug_info.created_at }}</td></tr>
+                    <tr><th>更新日時</th><td>{{ debug_info.updated_at }}</td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3>クイズ情報</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>クイズ数:</strong> {{ debug_info.quiz_count }}</p>
+                
+                {% if debug_info.quizzes %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>質問</th>
+                                <th>作成日時</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz in debug_info.quizzes %}
+                            <tr>
+                                <td>{{ quiz.id }}</td>
+                                <td>{{ quiz.question }}</td>
+                                <td>{{ quiz.created_at }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="alert alert-warning">
+                        クイズが見つかりません
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary">ダッシュボードに戻る</a>
+            <a href="?format=json" class="btn btn-info">JSON形式で表示</a>
+        </div>
+    </div>
+</body>
+</html>

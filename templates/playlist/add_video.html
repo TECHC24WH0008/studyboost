@@ -1,0 +1,13 @@
+<h2>{{ playlist.name }} に動画を追加</h2>
+<form method="post">
+  {% csrf_token %}
+  <label for="video_url">YouTube動画URL:</label><br>
+  <input type="url" id="video_url" name="video_url" required style="width:400px;"><br><br>
+  <button type="submit">追加</button>
+</form>
+
+{% for message in messages %}
+  <p style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
+    {{ message }}
+  </p>
+{% endfor %}

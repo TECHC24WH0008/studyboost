@@ -1,0 +1,24 @@
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Googleログイン</title>
+</head>
+<body>
+    <div id="loading" style="text-align: center; padding: 50px;">
+        <h2>🔄 Google認証画面に移動中...</h2>
+        <p>自動的にGoogle認証画面にリダイレクトしています。</p>
+        <p>リダイレクトされない場合は、<a href="{% provider_login_url 'google' %}" id="manual-link">こちらをクリック</a>してください。</p>
+    </div>
+
+    <script>
+        // ページ読み込み後すぐにGoogle認証画面にリダイレクト
+        window.onload = function() {
+            setTimeout(function() {
+                window.location.href = "{% provider_login_url 'google' %}";
+            }, 1000); // 1秒後にリダイレクト
+        };
+    </script>
+</body>
+</html>
